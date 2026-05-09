@@ -1,0 +1,20 @@
+{
+  "name": "qa-assessment-wheel-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "env:localhost": "cross-env NODE_ENV=localhost npx playwright test",
+    "env:staging": "cross-env NODE_ENV=staging npx playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2"
+  }
+}
