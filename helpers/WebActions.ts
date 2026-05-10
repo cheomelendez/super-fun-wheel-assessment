@@ -19,4 +19,12 @@ export default class WebActions {
         await this.page.reload();
         console.log('Page refreshed');
     }
+    async clearLocalStorage(): Promise<void> {
+        await this.page.evaluate(() => localStorage.clear());
+        console.log('Local storage cleared');
+    }
+    async closeBrowser(): Promise<void> {
+        await this.page.context().browser()?.close();
+        console.log('Browser closed');
+    }   
 }
