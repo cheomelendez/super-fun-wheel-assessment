@@ -11,20 +11,20 @@ test.describe.serial('Game Initialization', () => {
         //await webActions.closeBrowser();
     });
 
-    test('Verify loading screen appears on launch', async ({ webActions, superFunWheel }) => {
+    test('Verify loading screen appears on launch', async ({ superFunWheel }) => {
         await superFunWheel.waitForPreloaderToAppear();
         const preloaderVisible = await superFunWheel.isPreloaderVisible();
         expect(preloaderVisible).toBeTruthy();
     });
 
-    test('Verify loading screen disappears after load', async ({ webActions, superFunWheel }) => {
+    test('Verify loading screen disappears after load', async ({ superFunWheel }) => {
         await superFunWheel.waitForPreloaderToAppear();
         await superFunWheel.waitForPreloaderToDisappear();
         const preloaderVisibleAfterLoad = await superFunWheel.isPreloaderVisible();
         expect(preloaderVisibleAfterLoad).toBeFalsy();
     });     
     
-    test('Verify all UI Elements are visible after game is fully loaded', async ({ webActions, superFunWheel }) => {
+    test('Verify all UI Elements are visible after game is fully loaded', async ({ superFunWheel }) => {
         await superFunWheel.waitForPreloaderToAppear();
         await superFunWheel.waitForPreloaderToDisappear();
         const areConsoleElementsVisible = await superFunWheel.areConsoleElementsVisible();

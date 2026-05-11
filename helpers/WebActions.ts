@@ -26,5 +26,5 @@ export default class WebActions {
     async closeBrowser(): Promise<void> {
         await this.page.context().browser()?.close();
         console.log('Browser closed');
-    }   
+    }     
 }

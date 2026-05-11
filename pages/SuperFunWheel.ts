@@ -56,4 +56,21 @@ export default class SuperFunWheel {
         }
         return true;
     }
+
+    async getBetAmount(): Promise<number> {
+        const betText = await this.bet.innerText();
+        const betAmount = Number(betText.match(/\d+(\.\d+)?/)?.[0]);
+        //expect(Number.isNaN(betAmount)).toBeFalsy();
+        return betAmount;
+    };
+    async decreaseBet(times:number): Promise<void> {
+        for (let i = 0; i < times; i++) {
+            await this.decrementButton.click();
+        }
+    }
+    async increaseBet(times:number): Promise<void> {
+        for (let i = 0; i < times; i++) {
+            await this.incrementButton.click();
+        }
+    }
 }
