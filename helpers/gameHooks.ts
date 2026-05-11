@@ -82,6 +82,35 @@ export default class GameHooks {
             { timeout },
         );
     }
+
+    async expectWheelStateToRemain(expectedState: string, duration: number = 10000): Promise<void> {
+        await this.page.evaluate(
+            ({ expectedState, duration }) => {
+                return new Promise<void>((resolve, reject) => {
+                    const startedAt = Date.now();
+
+                    const checkState = () => {
+                        const currentState = (window as any).game.wheel.state;
+
+                        if (currentState !== expectedState) {
+                            reject(new Error(`Expected wheel state to remain ${expectedState}, but it changed to ${currentState}`));
+                            return;
+                        }
+
+                        if (Date.now() - startedAt >= duration) {
+                            resolve();
+                            return;
+                        }
+
+                        requestAnimationFrame(checkState);
+                    };
+
+                    checkState();
+                });
+            },
+            { expectedState, duration },
+        );
+    }
     
     async waitForWheelStateSequence(expectedStates: string[], timeout: number = 10000): Promise<string[]> {
         return await this.page.evaluate(
@@ -136,5 +165,4 @@ export default class GameHooks {
         }
         return true;
     }
-
 }
