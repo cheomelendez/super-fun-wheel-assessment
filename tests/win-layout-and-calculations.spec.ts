@@ -78,13 +78,13 @@ test.describe('Win Layout and Calculations', () => {
             });
         }
     });
-    test('Win Plate fade out after changing bet amount or spinning again', async ({ superFunWheel, gameHooks }) => {
+    test('Win Plate fade out after changing bet amount or spinning again', async ({ superFunWheel, gameHooks, webActions }) => {
         let plateLayout: boolean;
         const scenarios = [
             { name: 'increase', action: async () => await superFunWheel.increaseBet(1) },
             { name: 'decrease', action: async () => await superFunWheel.decreaseBet(1) },
             { name: 'spin again', action: async () => await superFunWheel.spinButton.click() },
-            { name: 'refresh', action: async () => await superFunWheel.page.reload() }
+            { name: 'refresh', action: async () => await webActions.refreshPage() }
         ];
         await gameHooks.setWheelLandIndex(1);
         for (const scenario of scenarios) {
@@ -93,6 +93,7 @@ test.describe('Win Layout and Calculations', () => {
                 await gameHooks.waitForWheelState('RESOLVED');
                 await scenario.action();
                 if (scenario.name === 'refresh') {
+                    await superFunWheel.waitForPreloaderToAppear();
                     await superFunWheel.waitForPreloaderToDisappear();
                 }            
                 plateLayout = await gameHooks.isPlateWinVisible();
