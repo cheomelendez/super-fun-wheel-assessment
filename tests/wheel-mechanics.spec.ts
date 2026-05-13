@@ -11,15 +11,13 @@ test.describe('Wheel Mechanics', () => {
     });
     test.afterEach(async ({ webActions }) => {
         await webActions.clearLocalStorage();
-        //await webActions.closeBrowser();
+        await webActions.closeBrowser();
     });
-
     test.fixme('Wheel slices config is correct', async ({ gameHooks }) => {
         const isValidWheelConfig = await gameHooks.validateWheelConfig();
         expect(isValidWheelConfig).toBeTruthy();
 
     });  
-        
     test.fixme('Spin button became disabled after clicking and re-enabled after spin completes', async ({ superFunWheel, gameHooks }) => {
         await superFunWheel.spinButton.click();
         expect(await superFunWheel.spinButton.isDisabled()).toBeTruthy();

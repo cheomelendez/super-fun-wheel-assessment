@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type {Page, ConsoleMessage } from '@playwright/test';
 
 type PlayerData = Partial<{
     balance: number;
@@ -75,6 +75,10 @@ export default class GameHooks {
         }, index);
     }
 
+    async isPlateWinVisible(): Promise<boolean> {
+        return await this.page.evaluate(() => (window as any).game.winDialog.visible);
+    }
+
     async waitForWheelState(expectedState: string, timeout: number = 10000): Promise<void> {
         await this.page.waitForFunction(
             (state) => (window as any).game.wheel.state === state,
@@ -88,23 +92,18 @@ export default class GameHooks {
             ({ expectedState, duration }) => {
                 return new Promise<void>((resolve, reject) => {
                     const startedAt = Date.now();
-
                     const checkState = () => {
                         const currentState = (window as any).game.wheel.state;
-
                         if (currentState !== expectedState) {
                             reject(new Error(`Expected wheel state to remain ${expectedState}, but it changed to ${currentState}`));
                             return;
                         }
-
                         if (Date.now() - startedAt >= duration) {
                             resolve();
                             return;
                         }
-
                         requestAnimationFrame(checkState);
                     };
-
                     checkState();
                 });
             },
@@ -119,28 +118,22 @@ export default class GameHooks {
                     const matchedStates: string[] = [];
                     let expectedIndex = 0;
                     const startedAt = Date.now();
-
                     const checkState = () => {
                         const currentState = (window as any).game.wheel.state;
-
                         if (currentState === expectedStates[expectedIndex]) {
                             matchedStates.push(currentState);
                             expectedIndex += 1;
                         }
-
                         if (expectedIndex === expectedStates.length) {
                             resolve(matchedStates);
                             return;
                         }
-
                         if (Date.now() - startedAt > timeout) {
                             reject(new Error(`Expected wheel states ${expectedStates.join(' -> ')}, received ${matchedStates.join(' -> ')}`));
                             return;
                         }
-
                         requestAnimationFrame(checkState);
                     };
-
                     checkState();
                 });
             },
@@ -165,4 +158,59 @@ export default class GameHooks {
         }
         return true;
     }
+    async listenToWinSignal(): Promise<void> {
+        await this.page.evaluate(() => {
+            (window as any).listenToWinSignal();
+        });
+    }
+
+    async listenToBalanceSignal(): Promise<void> {
+        await this.page.evaluate(() => {
+            (window as any).listenToBalanceSignal();
+        });
+    }
+
+    async listenToWheelResolvedSignal(): Promise<void> {
+        await this.page.evaluate(() => {
+            (window as any).listenToWheelResolvedSignal();
+        });
+    }
+
+    async waitForWinSignal(timeout: number = 10000): Promise<number> {
+        const signalPromise = this.waitForConsoleNumber(/\[Signal #\d+\] Win updated: (\d+(?:\.\d+)?)/, timeout);
+        await this.listenToWinSignal();
+        return await signalPromise;
+    }
+
+    async waitForBalanceSignal(timeout: number = 10000): Promise<number> {
+        const signalPromise = this.waitForConsoleNumber(/\[Signal #\d+\] Balance updated: (\d+(?:\.\d+)?)/, timeout);
+        await this.listenToBalanceSignal();
+        return await signalPromise;
+    }
+
+    async waitForWheelResolvedSignal(timeout: number = 10000): Promise<number> {
+        const signalPromise = this.waitForConsoleNumber(/\[Signal #\d+\] Wheel resolved at index: (\d+)/, timeout);
+        await this.listenToWheelResolvedSignal();
+        return await signalPromise;
+    }
+
+     private async waitForConsoleNumber(pattern: RegExp, timeout: number): Promise<number> {
+        return await new Promise<number>((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                this.page.off('console', onConsoleMessage);
+                reject(new Error(`Timed out waiting for console message matching ${pattern}`));
+            }, timeout);
+            const onConsoleMessage = (message: ConsoleMessage) => {
+                const match = message.text().match(pattern);
+                if (!match) {
+                    return;
+                }
+                clearTimeout(timeoutId);
+                this.page.off('console', onConsoleMessage);
+                resolve(Number(match[1]));
+            };
+            this.page.on('console', onConsoleMessage);
+        });
+    }
+
 }

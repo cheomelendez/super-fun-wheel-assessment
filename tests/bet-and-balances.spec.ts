@@ -11,7 +11,7 @@ test.describe('Bet and Balances', () => {
     });
     test.afterEach(async ({ webActions }) => {
         await webActions.clearLocalStorage();
-        //await webActions.closeBrowser();
+        await webActions.closeBrowser();
     });
 
     test('Increase and Decrease Bet Amount', async ({ superFunWheel }) => {
@@ -20,7 +20,6 @@ test.describe('Bet and Balances', () => {
         const increasedBetAmount = await superFunWheel.getBetAmount();
         expect(increasedBetAmount).toBeGreaterThan(initialBetAmount);
         expect(increasedBetAmount).toBe(initialBetAmount + 10);
-
         await superFunWheel.decrementButton.click();
         const decreasedBetAmount = await superFunWheel.getBetAmount();
         expect(decreasedBetAmount).toBe(initialBetAmount);

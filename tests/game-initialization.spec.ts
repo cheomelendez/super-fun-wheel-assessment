@@ -8,22 +8,19 @@ test.describe.serial('Game Initialization', () => {
     });
     test.afterEach(async ({ webActions }) => {
         await webActions.clearLocalStorage();
-        //await webActions.closeBrowser();
+        await webActions.closeBrowser();
     });
-
     test('Verify loading screen appears on launch', async ({ superFunWheel }) => {
         await superFunWheel.waitForPreloaderToAppear();
         const preloaderVisible = await superFunWheel.isPreloaderVisible();
         expect(preloaderVisible).toBeTruthy();
     });
-
     test('Verify loading screen disappears after load', async ({ superFunWheel }) => {
         await superFunWheel.waitForPreloaderToAppear();
         await superFunWheel.waitForPreloaderToDisappear();
         const preloaderVisibleAfterLoad = await superFunWheel.isPreloaderVisible();
         expect(preloaderVisibleAfterLoad).toBeFalsy();
-    });     
-    
+    });        
     test('Verify all UI Elements are visible after game is fully loaded', async ({ superFunWheel }) => {
         await superFunWheel.waitForPreloaderToAppear();
         await superFunWheel.waitForPreloaderToDisappear();

@@ -11,20 +11,24 @@ export default class WebActions {
         await this.page.goto(url);
         console.log(`Navigating to: ${url}`);
     }
+
     async waitForFewSeconds(seconds: number): Promise<void> {
         await this.page.waitForTimeout(seconds * 1000);
         console.log(`Waiting for ${seconds} seconds`);
     }
+
     async refreshPage(): Promise<void> {
         await this.page.reload();
         console.log('Page refreshed');
     }
+
     async clearLocalStorage(): Promise<void> {
         await this.page.evaluate(() => localStorage.clear());
         console.log('Local storage cleared');
     }
+
     async closeBrowser(): Promise<void> {
-        await this.page.context().browser()?.close();
+        await this.page.context()?.close();
         console.log('Browser closed');
     }     
 }
